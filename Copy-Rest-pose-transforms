@@ -1,0 +1,34 @@
+import bpy
+
+# Armature names
+src_name = "Armature"        # Source armature (Reference)
+dst_name = "Armature.001"    # Target armature (with animation)
+
+src_arm = bpy.data.objects[src_name]
+dst_arm = bpy.data.objects[dst_name]
+
+# Set both to OBJECT mode
+bpy.ops.object.mode_set(mode='OBJECT')
+
+# Activate source, switch to Edit Mode to read bones
+bpy.context.view_layer.objects.active = src_arm
+bpy.ops.object.mode_set(mode='EDIT')
+src_bones = {b.name: b for b in src_arm.data.edit_bones}
+
+# Activate target, switch to Edit Mode to write bones
+bpy.context.view_layer.objects.active = dst_arm
+bpy.ops.object.mode_set(mode='EDIT')
+dst_bones = dst_arm.data.edit_bones
+
+# Copy head, tail, and roll for all existing bones
+for name, src_bone in src_bones.items():
+    if name in dst_bones:
+        dst_bone = dst_bones[name]
+        dst_bone.head = src_bone.head.copy()
+        dst_bone.tail = src_bone.tail.copy()
+        dst_bone.roll = src_bone.roll
+
+# Return to Pose Mode
+bpy.ops.object.mode_set(mode='POSE')
+
+print("✅ Rest pose copied successfully.")
